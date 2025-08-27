@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembe Zarf – Küçük Bir Aşk Notu</title>
+    <meta name="description" content="Zarfa tıkla, not açılsın; kalpten kısa bir şiirle.">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', 'Roboto', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #F8BBD0 0%, #F48FB1 50%, #F06292 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .envelope-container {
+            position: relative;
+            transform: translateZ(0);
+            will-change: transform;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .envelope-container:hover:not(.opened) {
+            transform: scale(1.04) translateZ(0);
+        }
+
+        .envelope-container:focus:not(.opened) {
+            transform: scale(1.04) translateZ(0);
+            outline: 3px solid #B0003A;
+            outline-offset: 8px;
+            border-radius: 8px;
+        }
+
+        .envelope {
+            position: relative;
+            width: clamp(380px, 40vw, 520px);
+            height: clamp(280px, 28vw, 380px);
+            cursor: pointer;
+            transform: translateZ(0);
+            transform-style: preserve-3d;
+        }
+
+        .envelope-body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #E8A5C0 0%, #E091B3 30%, #D67FA6 70%, #CC6D99 100%);
+            border-radius: 8px;
+            box-shadow: 
+                0 20px 60px rgba(204, 109, 153, 0.4),
+                0 12px 30px rgba(204, 109, 153, 0.25),
+                0 6px 15px rgba(204, 109, 153, 0.15),
+                inset 0 3px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -3px 0 rgba(176, 0, 58, 0.15),
+                inset 2px 0 0 rgba(255, 255, 255, 0.1),
+                inset -2px 0 0 rgba(176, 0, 58, 0.08);
+            z-index: 1;
+            transform: translateZ(0);
+        }
+
+        .envelope-body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.15) 0%, 
+                transparent 20%,
+                transparent 80%,
+                rgba(176, 0, 58, 0.08) 100%);
+            border-radius: 8px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .envelope-body::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                transparent 50%);
+            border-radius: 6px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .envelope-lid {
+            position: absolute;
+            width: 100%;
+            height: 65%;
+            top: 0;
+            left: 0;
+            background: linear-gradient(145deg, #D67FA6 0%, #CC6D99 30%, #C2185B 70%, #B0003A 100%);
+            transform-origin: 50% 100%;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 
+                0 15px 40px rgba(176, 0, 58, 0.5),
+                0 8px 20px rgba(176, 0, 58, 0.3),
+                0 4px 10px rgba(176, 0, 58, 0.2),
+                inset 0 2px 0 rgba(255, 255, 255, 0.25),
+                inset 0 -2px 0 rgba(176, 0, 58, 0.2),
+                inset 2px 0 0 rgba(255, 255, 255, 0.1),
+                inset -2px 0 0 rgba(176, 0, 58, 0.1);
+            z-index: 3;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            will-change: transform;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform: translateZ(10px);
+        }
+
+        .envelope-lid::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(145deg, 
+                rgba(255, 255, 255, 0.2) 0%, 
+                rgba(255, 255, 255, 0.1) 25%,
+                transparent 50%, 
+                rgba(176, 0, 58, 0.1) 100%);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .envelope-lid::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(176, 0, 58, 0.3) 50%, 
+                transparent 100%);
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .envelope-fold-line {
+            content: "";
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 20px solid rgba(176, 0, 58, 0.15);
+            z-index: 1;
+            opacity: 0.6;
+            transform: translateX(-50%) translateZ(-5px);
+            pointer-events: none;
+        }
+
+        .envelope-container.opened .envelope-lid {
+            transform: rotateX(-160deg);
+        }
+
+        .note-paper {
+            position: absolute;
+            width: 92%;
+            height: 85%;
+            top: 8%;
+            left: 50%;
+            transform: translate(-50%, 0%) translateY(100%);
+            background: linear-gradient(145deg, #FFFBF5 0%, #FFF8F0 50%, #FFFAF5 100%);
+            border-radius: 0;
+            box-shadow: 
+                0 -8px 25px rgba(0, 0, 0, 0.15),
+                0 -4px 12px rgba(0, 0, 0, 0.1),
+                0 -2px 6px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                inset 1px 0 0 rgba(255, 255, 255, 0.5),
+                inset -1px 0 0 rgba(0, 0, 0, 0.05);
+            z-index: 2;
+            opacity: 0;
+            transform: translateZ(15px);
+            transition: all 0.9s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            will-change: transform, opacity;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(24px, 6vw, 40px);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+        }
+
+        .note-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, transparent 50%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 24px,
+                    rgba(240, 98, 146, 0.03) 25px
+                );
+            pointer-events: none;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .envelope-container.opened .note-paper {
+            transform: translate(-50%, 0%) translateY(-15%);
+            opacity: 1;
+            transition-delay: 0.4s;
+        }
+
+        .poem-text {
+            color: #B0003A;
+            font-size: clamp(18px, 4.5vw, 24px);
+            line-height: 1.4;
+            text-align: center;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 2px rgba(176, 0, 58, 0.1);
+        }
+
+        /* Accessibility - Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .envelope-lid,
+            .note-paper,
+            .envelope-container {
+                transition-duration: 0.1s !important;
+                transition-delay: 0s !important;
+            }
+            
+            .envelope-container.opened .note-paper {
+                transition-delay: 0.1s !important;
+            }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .envelope {
+                width: clamp(320px, 70vw, 400px);
+                height: clamp(230px, 50vw, 285px);
+            }
+            
+            .envelope-container:hover:not(.opened) {
+                transform: scale(1.02) translateZ(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .note-paper {
+                padding: clamp(16px, 4vw, 24px);
+            }
+            
+            .poem-text {
+                font-size: clamp(16px, 4vw, 20px);
+                line-height: 1.3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div 
+            class="envelope-container" 
+            role="button" 
+            tabindex="0" 
+            aria-label="Zarfı aç"
+            id="envelopeContainer"
+        >
+            <div class="envelope">
+                <div class="envelope-body"></div>
+                <div class="envelope-lid"></div>
+                <div class="note-paper">
+                    <div class="poem-text">vedattttttttt seni yerim lan kuru göt.</div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            const envelopeContainer = document.getElementById('envelopeContainer');
+            let isAnimating = false;
+
+            function openEnvelope() {
+                if (isAnimating) return;
+                
+                isAnimating = true;
+                envelopeContainer.classList.add('opened');
+                envelopeContainer.setAttribute('aria-expanded', 'true');
+                envelopeContainer.setAttribute('aria-label', 'Zarf açıldı');
+                
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 1400);
+            }
+
+            // Event listeners for envelope
+            envelopeContainer.addEventListener('click', openEnvelope);
+            envelopeContainer.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (!envelopeContainer.classList.contains('opened')) {
+                        openEnvelope();
+                    }
+                }
+            });
+
+            // Prevent multiple rapid clicks
+            document.addEventListener('click', (e) => {
+                if (isAnimating) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+
+            // Initial accessibility attributes
+            envelopeContainer.setAttribute('aria-expanded', 'false');
+            
+            // Preload optimization
+            const style = document.createElement('style');
+            style.textContent = `
+                .envelope-container, .envelope-lid, .note-paper {
+                    transform: translateZ(0);
+                }
+            `;
+            document.head.appendChild(style);
+        })();
+    </script>
+</body>
+</html>
